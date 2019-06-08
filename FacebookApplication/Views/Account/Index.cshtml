@@ -21,7 +21,7 @@
 
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li>partial view here</li>
+                        <li>@Html.Action("LoginPartial", "Account")</li>
                     </ul>
                 </div>
             </div>
@@ -109,6 +109,37 @@
     <script>
         $(document).ready(function () {
 
+
+            /*
+            / Login form ajax
+            */
+
+            $("form#loginform").submit(function (e) {
+                e.preventDefault();
+
+                var $this = $(this);
+
+                $this.find(".ajaxdiv").removeClass("hide");
+
+                var username = $("#Username").val();
+                var password = $("#Password").val();
+                var url = "/account/Login";
+
+                $.post(url, { username: username, password: password }, function (data) {
+                    var response = data.trim();
+
+                    if (response == "ok") {
+                        document.location.href = "/";
+                    } else {
+                        $this.find(".ajaxdiv").addClass("hide");
+                        $("div.em").fadeIn("fast");
+                        setTimeout(function () {
+                            $("div.em").fadeOut("fast");
+                        }, 2000);
+                    }
+                });
+
+            });
 
 
             ////////////////////////////////////////////////////

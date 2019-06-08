@@ -83,9 +83,10 @@ namespace FacebookApplication.Controllers
 
 
         // GET: /{username}
-        public string Username(string username = "")
+        [Authorize]
+        public ActionResult Username(string username = "")
         {
-            return username;
+            return View();
         }
 
         // GET: account/Logout
@@ -97,14 +98,29 @@ namespace FacebookApplication.Controllers
             return Redirect("~/");
         }
 
+        public ActionResult LoginPartial()
+        {
+            return PartialView();
+        }
 
 
+        // POST: account/Login
+        [HttpPost]
+        public string Login(string username, string password)
+        {
+            Db db = new Db();
 
+            if (db.Users.Any(x => x.Username.Equals(username) && x.Password.Equals(password)))
+            {
+                FormsAuthentication.SetAuthCookie(username, false);
+                return "ok";
+            }
+            else
+            {
+                return "problem";
+            }
 
-
-
-
-
+        }
 
     }
 }
