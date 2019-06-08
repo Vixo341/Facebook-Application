@@ -20,11 +20,15 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    <li class="livesearchli">
+                        <input type="text" class="searchtext" id="searchtext" placeholder="Search friends..." />
+                        <ul id="livesearchul"></ul>
                     </li>
                 </ul>
                 @if (Request.IsAuthenticated)
                 {
                     <ul class="nav navbar-nav navbar-right owner">
+                   <li class="name">@ViewBag.FullName</li>
                     <li class="logout">@Html.ActionLink("Logout", "Logout", "Account")</li>
                     </ul>
                 }

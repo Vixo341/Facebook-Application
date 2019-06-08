@@ -86,6 +86,29 @@ namespace FacebookApplication.Controllers
         [Authorize]
         public ActionResult Username(string username = "")
         {
+            Db db = new Db();
+
+            if (!db.Users.Any(x => x.Username.Equals(username)))
+            {
+                return Redirect("~/");
+            }
+
+            ViewBag.Username = username;
+
+            string user = User.Identity.Name;
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(user)).FirstOrDefault();
+            ViewBag.FullName = userDTO.FirstName + " " + userDTO.LastName;
+
+            int userId = userDTO.Id;
+
+            ViewBag.UserId = userId;
+
+            UserDTO userDTO2 = db.Users.Where(x => x.Username.Equals(username)).FirstOrDefault();
+            ViewBag.ViewingFullName = userDTO2.FirstName + " " + userDTO2.LastName;
+
+            ViewBag.UsernameImage = userDTO2.Id + ".jpg";
+
             return View();
         }
 

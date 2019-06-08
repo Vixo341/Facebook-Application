@@ -1,7 +1,69 @@
 ﻿
 @{
-    ViewBag.Title = "Username";
+    ViewBag.Title = ViewBag.Username;
 }
 
-<h2>Username</h2>
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <p class="userimg">
+            <img src="~/Uploads/@ViewBag.UsernameImage" />
+        </p>
+        <h2>@ViewBag.ViewingFullName (@ViewBag.Username)</h2>
 
+    </div>
+
+
+    <div class="col-xs-12 col-md-6 wall">
+
+    </div>
+
+
+    </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            /*
+            / Live Search
+            */
+
+            $("input#searchtext").keyup(function () {
+
+                var searchVal = $("input#searchtext").val();
+
+                $("ul#livesearchul").empty();
+
+                if (searchVal == "" || searchVal == " ") return false;
+
+                var url = "profile/LiveSearch";
+
+                $.post(url, { searchVal: searchVal }, function (data) {
+
+                    if ($("ul#livesearchul li.close").length) return;
+
+                    if (data.length > 0) {
+                        $("ul#livesearchul").append("<li class=close>x</li>");
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+
+                        $("ul#livesearchul").append('<li class=livesearchli><a href="/' + obj.Username + '"><img src="uploads/' + obj.UserId + '.jpg" />' + ' ' + obj.FirstName + ' ' + obj.LastName + '</a></li>');
+                    }
+
+                });
+
+            });
+
+            $("body").on("click", "ul#livesearchul li.close", function () {
+                $("ul#livesearchul").empty();
+                $("input#searchtext").val("");
+            });
+
+            ////////////////////////////////////////////////////
+
+        }); // End ready
+    </script>
+
+}
