@@ -4,23 +4,55 @@
 }
 
 <div class="row">
+
     <div class="col-xs-12 col-md-6">
         <p class="userimg">
             <img src="~/Uploads/@ViewBag.UsernameImage" />
         </p>
         <h2>@ViewBag.ViewingFullName (@ViewBag.Username)</h2>
 
-    </div>
+        @if (ViewBag.UserType == "guest")
+        {
+            <div class="friends">
+                @if (ViewBag.NotFriends == "Pending")
+                {
+                    <div class="arefriendsdiv alert alert-warning">
+                        <p>Pending friend request.</p>
+                    </div>
+                }
+                else if (ViewBag.NotFriends == "True")
+                {
+                    <div class="arefriendsdiv afc hide alert alert-info">
+                        <a href="#" class="addfriend">Add Friend</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="arefriendsdiv alert alert-success">
+                        <span class="glyphicon glyphicon-thumbs-up"></span> friends
+                    </div>
+                }
+            </div>
+        }
 
+        <div class="friends @User.Identity.Name alert alert-success">
+            <span>@ViewBag.FCount</span> friend(s)
+        </div>
+
+    </div>
 
     <div class="col-xs-12 col-md-6 wall">
 
     </div>
 
+</div>
 
-    </div>
+
+
 
 @section Scripts {
+    <script src="~/Scripts/jquery.signalR-2.1.2.min.js"></script>
+    <script src="/signalr/hubs"></script>
     <script>
         $(document).ready(function () {
 
@@ -62,6 +94,127 @@
             });
 
             ////////////////////////////////////////////////////
+
+            /*
+            / Hub
+            */
+
+            var hub = $.connection.echo;
+
+            hub.client.test = function (msg) {
+                console.log(msg);
+            }
+
+            hub.client.frcount = function (username, count) {
+
+                if (count > 0) {
+                    $("span.frnotif." + username + "> span").text(count);
+                } else {
+                    $("span.frnotif." + username + "> span").text("");
+                    $("span.frnotif." + username).removeClass("red");
+                }
+
+            }
+
+
+            // Connect to the hub
+            $.connection.hub
+                        .start()
+                        .done(function () {
+
+                            hub.server.hello("Signalr working");
+
+                            /*
+                            / Add Friend
+                            */
+
+                            $("a.addfriend").click(function (e) {
+                                e.preventDefault();
+
+                                var friend = '@ViewBag.Username';
+
+                                var url = "/profile/AddFriend";
+
+                                $.post(url, { friend: friend }, function (data) {
+                                    $('.arefriendsdiv').removeClass("alert-info").addClass("alert-warning").html('<p>Pending friend request.</p>');
+                                }).done(function () {
+                                    hub.server.notify(friend);
+                                });
+                            });
+
+                            ////////////////////////////////////////////////////
+                        });
+                            /*
+                            / Accept friend request
+                            */
+
+
+
+                            ////////////////////////////////////////////////////
+
+                            /*
+                            / Decline friend request
+                            */
+
+
+
+                            ////////////////////////////////////////////////////
+
+                            /*
+                            / Decline friend request
+                            */
+
+
+
+                            ////////////////////////////////////////////////////
+
+                            /*
+                            / Display unread messages
+                            */
+
+
+
+                            ////////////////////////////////////////////////////
+
+                            /*
+                            / Display unread messages
+                            */
+
+ 
+
+
+
+                            ////////////////////////////////////////////////////
+
+                      
+
+            ////////////////////////////////////////////////////
+
+            /*
+            / Display friend requests
+            */
+
+
+
+            ////////////////////////////////////////////////////
+
+            /*
+            / Update wall message
+            */
+
+
+
+
+            ////////////////////////////////////////////////////
+
+            /*
+            / Open chat box
+            */
+
+
+
+            ////////////////////////////////////////////////////
+
 
         }); // End ready
     </script>

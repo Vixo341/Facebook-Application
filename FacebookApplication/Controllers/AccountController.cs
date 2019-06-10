@@ -109,6 +109,50 @@ namespace FacebookApplication.Controllers
 
             ViewBag.UsernameImage = userDTO2.Id + ".jpg";
 
+            string userType = "guest";
+
+            if (username.Equals(user))
+                userType = "owner";
+
+            ViewBag.UserType = userType;
+
+
+
+            if (userType == "guest")
+            {
+                UserDTO u1 = db.Users.Where(x => x.Username.Equals(user)).FirstOrDefault();
+                int id1 = u1.Id;
+
+                UserDTO u2 = db.Users.Where(x => x.Username.Equals(username)).FirstOrDefault();
+                int id2 = u2.Id;
+
+                FriendDTO f1 = db.Friends.Where(x => x.User1 == id1 && x.User2 == id2).FirstOrDefault();
+                FriendDTO f2 = db.Friends.Where(x => x.User2 == id1 && x.User1 == id2).FirstOrDefault();
+
+                if (f1 == null && f2 == null)
+                {
+                    ViewBag.NotFriends = "True";
+                }
+
+                if (f1 != null)
+                {
+                    if (!f1.Active)
+                    {
+                        ViewBag.NotFriends = "Pending";
+                    }
+                }
+
+                if (f2 != null)
+                {
+                    if (!f2.Active)
+                    {
+                        ViewBag.NotFriends = "Pending";
+                    }
+                }
+
+            }
+
+            // Return
             return View();
         }
 

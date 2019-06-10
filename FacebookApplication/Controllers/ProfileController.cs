@@ -26,5 +26,29 @@ namespace FacebookApplication.Controllers
             return Json(usernames);
         }
 
+        // POST: Profile/AddFriend
+        [HttpPost]
+        public void AddFriend(string friend)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            UserDTO userDTO2 = db.Users.Where(x => x.Username.Equals(friend)).FirstOrDefault();
+            int friendId = userDTO2.Id;
+
+
+            FriendDTO friendDTO = new FriendDTO();
+
+            friendDTO.User1 = userId;
+            friendDTO.User2 = friendId;
+            friendDTO.Active = false;
+
+            db.Friends.Add(friendDTO);
+
+            db.SaveChanges();
+        }
+
     }
 }
