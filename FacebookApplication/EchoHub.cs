@@ -32,5 +32,42 @@ namespace FacebookApplication
             var clients = Clients.Others;
             clients.frnotify(friend, frCount);
         }
+
+        public void GetFrcount()
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(Context.User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            var friendReqCount = db.Friends.Count(x => x.User2 == userId && x.Active == false);
+
+            var clients = Clients.Caller;
+
+            clients.frcount(Context.User.Identity.Name, friendReqCount);
+        }
+
+
+        public void GetFcount(int friendId)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(Context.User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            var friendCount1 = db.Friends.Count(x => x.User2 == userId && x.Active == true || x.User1 == userId && x.Active == true);
+
+            UserDTO userDTO2 = db.Users.Where(x => x.Id == friendId).FirstOrDefault();
+            string username = userDTO2.Username;
+
+            var friendCount2 = db.Friends.Count(x => x.User2 == friendId && x.Active == true || x.User1 == friendId && x.Active == true);
+
+
+            var clients = Clients.All;
+
+            clients.fcount(Context.User.Identity.Name, username, friendCount1, friendCount2);
+
+        }
+
     }
 }

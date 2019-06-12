@@ -159,6 +159,14 @@ namespace FacebookApplication.Controllers
                 ViewBag.FRCount = friendCount;
             }
 
+            UserDTO uDTO = db.Users.Where(x => x.Username.Equals(username)).FirstOrDefault();
+            int usernameId = uDTO.Id;
+
+            var friendCount2 = db.Friends.Count(x => x.User2 == usernameId && x.Active == true || x.User1 == usernameId && x.Active == true);
+
+            ViewBag.FCount = friendCount2;
+
+
             // Return
             return View();
         }

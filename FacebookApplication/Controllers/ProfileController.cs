@@ -74,5 +74,37 @@ namespace FacebookApplication.Controllers
             return Json(users);
         }
 
+
+        // POST: Profile/AcceptFriendRequest
+        [HttpPost]
+        public void AcceptFriendRequest(int friendId)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            FriendDTO friendDTO = db.Friends.Where(x => x.User1 == friendId && x.User2 == userId).FirstOrDefault();
+
+            friendDTO.Active = true;
+
+            db.SaveChanges();
+        }
+
+        // POST: Profile/DeclineFriendRequest
+        [HttpPost]
+        public void DeclineFriendRequest(int friendId)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            FriendDTO friendDTO = db.Friends.Where(x => x.User1 == friendId && x.User2 == userId).FirstOrDefault();
+
+            db.Friends.Remove(friendDTO);
+
+            db.SaveChanges();
+        }
     }
 }

@@ -34,7 +34,9 @@
                 }
             </div>
         }
-
+        <div class="friends @User.Identity.Name alert alert-success">
+            <span>@ViewBag.FCount</span> friend(s)
+        </div>
     </div>
 
     <div class="col-xs-12 col-md-6">
@@ -106,6 +108,31 @@
                 $("span.frnotif." + f).addClass("red");
             }
 
+            hub.client.frcount = function (username, count) {
+
+                if (count > 0) {
+                    $("span.frnotif." + username + "> span").text(count);
+                } else {
+                    $("span.frnotif." + username + "> span").text("");
+                    $("span.frnotif." + username).removeClass("red");
+                }
+
+            }
+
+            hub.client.fcount = function (u1, u2, count1, count2) {
+
+                if (count1 > 0) {
+                    $("div.friends." + u1 + "> span").text(count1);
+                } else {
+                    $("div.friends." + u1 + "> span").text("0");
+                }
+
+                if (count2 > 0) {
+                    $("div.friends." + u2 + "> span").text(count2);
+                } else {
+                    $("div.friends." + u2 + "> span").text("0");
+                }
+            }
 
 
             // Connect to the hub
@@ -138,7 +165,24 @@
                             /*
                             / Accept friend request
                             */
+                                
+                          $("body").on("click", "a.accept", function (e) {
+                            e.preventDefault();
 
+                             var $this = $(this);
+
+                             var friendId = $this.data("id");
+    
+                             var url = "profile/AcceptFriendRequest";
+
+                          $.post(url, { friendId: friendId }, function (data) {
+                          }).done(function () {
+                             $this.parent().fadeOut("fast");
+                             hub.server.getFrcount();
+                             hub.server.getFcount(friendId);
+                      });
+
+                  });
 
 
                             ////////////////////////////////////////////////////
@@ -147,6 +191,22 @@
                             / Decline friend request
                             */
 
+                          $("body").on("click", "a.decline", function (e) {
+                              e.preventDefault();
+
+                              var $this = $(this);
+
+                              var friendId = $this.data("id");
+
+                              var url = "profile/DeclineFriendRequest";
+
+                              $.post(url, { friendId: friendId }, function (data) {
+                              }).done(function () {
+                                  $this.parent().fadeOut("fast");
+                                  hub.server.getFrcount();
+                              });
+
+                          });
 
 
                             ////////////////////////////////////////////////////
