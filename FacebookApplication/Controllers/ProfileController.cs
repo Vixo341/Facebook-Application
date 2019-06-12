@@ -106,5 +106,47 @@ namespace FacebookApplication.Controllers
 
             db.SaveChanges();
         }
+
+        // POST: Profile/SendMessage
+        [HttpPost]
+        public void SendMessage(string friend, string message)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            UserDTO userDTO2 = db.Users.Where(x => x.Username.Equals(friend)).FirstOrDefault();
+            int userId2 = userDTO2.Id;
+
+
+            MessageDTO dto = new MessageDTO();
+
+            dto.From = userId;
+            dto.To = userId2;
+            dto.Message = message;
+            dto.DateSent = DateTime.Now;
+            dto.Read = false;
+
+            db.Messages.Add(dto);
+            db.SaveChanges();
+        }
+
+        // POST: Profile/DisplayUnreadMessages
+        [HttpPost]
+        public JsonResult DisplayUnreadMessages()
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            List<MessageVM> list = db.Messages.Where(x => x.To == userId && x.Read == false).ToArray().Select(x => new MessageVM(x)).ToList();
+
+            db.Messages.Where(x => x.To == userId && x.Read == false).ToList().ForEach(x => x.Read = true);
+            db.SaveChanges();
+
+            return Json(list);
+        }
     }
 }

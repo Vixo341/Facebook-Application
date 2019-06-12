@@ -69,5 +69,33 @@ namespace FacebookApplication
 
         }
 
+        public void NotifyOfMessage(string friend)
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(friend)).FirstOrDefault();
+            int friendId = userDTO.Id;
+
+            var messageCount = db.Messages.Count(x => x.To == friendId && x.Read == false);
+
+            var clients = Clients.Others;
+
+            clients.msgcount(friend, messageCount);
+        }
+
+        public void NotifyOfMessageOwner()
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(Context.User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            var messageCount = db.Messages.Count(x => x.To == userId && x.Read == false);
+
+            var clients = Clients.Caller;
+
+            clients.msgcount(Context.User.Identity.Name, messageCount);
+        }
+
     }
 }

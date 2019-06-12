@@ -167,6 +167,12 @@ namespace FacebookApplication.Controllers
             ViewBag.FCount = friendCount2;
 
 
+            var messageCount = db.Messages.Count(x => x.To == userId && x.Read == false);
+
+            ViewBag.MsgCount = messageCount;
+
+
+
             // Return
             return View();
         }
