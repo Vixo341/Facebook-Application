@@ -35,13 +35,9 @@
             </div>
         }
 
-        <div class="friends @User.Identity.Name alert alert-success">
-            <span>@ViewBag.FCount</span> friend(s)
-        </div>
-
     </div>
 
-    <div class="col-xs-12 col-md-6 wall">
+    <div class="col-xs-12 col-md-6">
 
     </div>
 
@@ -105,16 +101,11 @@
                 console.log(msg);
             }
 
-            hub.client.frcount = function (username, count) {
-
-                if (count > 0) {
-                    $("span.frnotif." + username + "> span").text(count);
-                } else {
-                    $("span.frnotif." + username + "> span").text("");
-                    $("span.frnotif." + username).removeClass("red");
-                }
-
+            hub.client.frnotify = function (f, count) {
+                $("span.frnotif." + f + "> span").text(count);
+                $("span.frnotif." + f).addClass("red");
             }
+
 
 
             // Connect to the hub
@@ -193,6 +184,32 @@
             /*
             / Display friend requests
             */
+
+            $("body").on("click", "span.frnotif.red", function () {
+
+                $("ul#frnotiful").empty();
+
+                var url = "profile/DisplayFriendRequests";
+
+                $.post(url, {}, function (data) {
+
+                    if (data.length > 0) {
+                        $("ul#frnotiful").append("<li class=close>x</li>");
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+
+                        $("ul#frnotiful").append('<li class=frnotifli><a href="/' + obj.Username + '"><img src="uploads/' + obj.Id + '.jpg" />' + ' ' + obj.FirstName + ' ' + obj.LastName + '</a> ' + '<a class=accept href=# data-id="' + obj.Id + '"><span class="glyphicon glyphicon-ok"></span></a>' + ' ' + '<a class=decline href=# data-id="' + obj.Id + '"><span class="glyphicon glyphicon-remove"></span></a> </li>');
+                    }
+
+                });
+
+            });
+
+            $("body").on("click", "ul#frnotiful li.close", function () {
+                $("ul#frnotiful").empty();
+            });
 
 
 

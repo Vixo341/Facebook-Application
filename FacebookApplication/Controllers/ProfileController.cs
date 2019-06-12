@@ -1,5 +1,6 @@
 ﻿using FacebookApplication.Models.Data;
 using FacebookApplication.Models.ViewModels.Profile;
+using FacebookClone.Models.ViewModels.Profile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,29 @@ namespace FacebookApplication.Controllers
             db.Friends.Add(friendDTO);
 
             db.SaveChanges();
+        }
+
+        // POST: Profile/DisplayFriendRequests
+        [HttpPost]
+        public JsonResult DisplayFriendRequests()
+        {
+            Db db = new Db();
+
+            UserDTO userDTO = db.Users.Where(x => x.Username.Equals(User.Identity.Name)).FirstOrDefault();
+            int userId = userDTO.Id;
+
+            List<FriendRequestVM> list = db.Friends.Where(x => x.User2 == userId && x.Active == false).ToArray().Select(x => new FriendRequestVM(x)).ToList();
+
+
+            List<UserDTO> users = new List<UserDTO>();
+
+            foreach (var item in list)
+            {
+                var user = db.Users.Where(x => x.Id == item.User1).FirstOrDefault();
+                users.Add(user);
+            }
+
+            return Json(users);
         }
 
     }

@@ -152,6 +152,13 @@ namespace FacebookApplication.Controllers
 
             }
 
+            var friendCount = db.Friends.Count(x => x.User2 == userId && x.Active == false);
+
+            if (friendCount > 0)
+            {
+                ViewBag.FRCount = friendCount;
+            }
+
             // Return
             return View();
         }
