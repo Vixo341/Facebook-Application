@@ -41,6 +41,23 @@
 
     <div class="col-xs-12 col-md-6 wall">
 
+        @if (ViewBag.UserType == "owner")
+        {
+            <h3>Say something</h3>
+
+            if (ViewBag.WallMessage == "")
+            {
+                <textarea id="say@(ViewBag.UserId)" placeholder="Say something..."></textarea>
+            }
+            else
+            {
+                <textarea id="say@(ViewBag.UserId)" placeholder="Say something...">@ViewBag.WallMessage</textarea>
+            }
+
+            <a href="#" id="sendsay" class="ta" data-id="@ViewBag.UserId">Say</a>
+            <img src="~/Content/Images/ajax-loaderblack.gif" class="hide" />
+        }
+
         @if (ViewBag.UserType == "guest")
         {
             if (ViewBag.NotFriends == null)
@@ -60,6 +77,30 @@
 
 </div>
 
+@if (ViewBag.UserType == "owner")
+{
+    <div class="row friendwallrow">
+        @if (Enumerable.Count(ViewBag.Walls) > 0)
+        {
+            <h3>What your friends are saying...</h3>
+            foreach (var item in ViewBag.Walls)
+            {
+                if (item.Message != "")
+                {
+                    <div class="friendwall">
+                        <img src="~/Uploads/@(item.Id).jpg" />
+                        @item.Message
+                    </div>
+                }
+
+            }
+        }
+        else
+        {
+            @:<h3>There are no friend walls.</h3>
+        }
+    </div>
+}
 
 
 
@@ -188,7 +229,7 @@
                             });
 
                             ////////////////////////////////////////////////////
-                        });
+                        
                             /*
                             / Accept friend request
                             */
@@ -310,13 +351,37 @@
                             / Display unread messages
                             */
 
- 
+            $("body").on("click", "a.sendchat", function (e) {
+                e.preventDefault();
+
+                var $this = $(this);
+
+                var friendId = $this.data("id");
+                var friendUsername = $this.data("friend");
+                var message = $this.parent().find("textarea").val();
+
+                $this.parent().find("textarea").val("");
+
+                hub.server.sendChat(friendId, friendUsername, message);
+
+            });
+
+
+            $("body").on("keypress", ".chatbox textarea", function (e) {
+                if (e.which == 13) {
+                    $(this).parent().find("a.sendchat").click();
+                    setTimeout(function () {
+                        $(this).parent().find("textarea").focus();
+                    }, 0);
+                }
+
+            });
 
 
 
                             ////////////////////////////////////////////////////
 
-                      
+        });            
 
             ////////////////////////////////////////////////////
 
@@ -357,7 +422,25 @@
             /*
             / Update wall message
             */
+            $("a#sendsay").click(function (e) {
+                e.preventDefault();
 
+                var $this = $(this);
+
+                $this.parent().find("img").removeClass("hide");
+
+                var id = $(this).data("id");
+
+                var message = $this.parent().find("textarea").val();
+
+                var url = "/profile/UpdateWallMessage";
+
+                $.post(url, { id: id, message: message }, function (data) {
+                }).done(function () {
+                    $this.parent().find("img").addClass("hide");
+                });
+
+            });
 
 
 

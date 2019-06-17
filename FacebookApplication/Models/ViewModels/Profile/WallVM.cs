@@ -8,19 +8,19 @@ namespace FacebookApplication.Models.ViewModels.Profile
 {
     public class WallVM
     {
-    //    public WallVM()
-    //    {
-   //     }
+        public WallVM()
+        {
+        }
 
-     //   public WallVM(WallDTO row)
-     //   {
-     //       Id = row.Id;
-    //        Message = row.Message;
-    //        DateEdited = row.DateEdited;
-    ///    }
+        public WallVM(WallDTO row)
+        {
+            Id = row.Id;
+            Message = row.Message;
+            DateEdited = row.DateEdited;
+        }
 
-    //    public int Id { get; set; }
-    //    public string Message { get; set; }
-    //    public DateTime DateEdited { get; set; }
+        public int Id { get; set; }
+        public string Message { get; set; }
+        public DateTime DateEdited { get; set; }
     }
 }

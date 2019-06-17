@@ -1,5 +1,6 @@
 ﻿using FacebookApplication.Models.Data;
 using FacebookApplication.Models.ViewModels.Account;
+using FacebookApplication.Models.ViewModels.Profile;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -75,8 +76,20 @@ namespace FacebookApplication.Controllers
 
                 string imageName = userId + ".jpg";
                 var path = string.Format("{0}\\{1}", uploadsDir, imageName);
+
                 file.SaveAs(path);
             }
+
+
+            WallDTO wall = new WallDTO();
+
+            wall.Id = userId;
+            wall.Message = "";
+            wall.DateEdited = DateTime.Now;
+
+            db.Wall.Add(wall);
+            db.SaveChanges();
+
             // Redirect
             return Redirect("~/" + model.Username);
         }
@@ -171,7 +184,19 @@ namespace FacebookApplication.Controllers
 
             ViewBag.MsgCount = messageCount;
 
+            WallDTO wall = new WallDTO();
+            ViewBag.WallMessage = db.Wall.Where(x => x.Id == userId).Select(x => x.Message).FirstOrDefault();
 
+
+            List<int> friendIds1 = db.Friends.Where(x => x.User1 == userId && x.Active == true).ToArray().Select(x => x.User2).ToList();
+
+            List<int> friendIds2 = db.Friends.Where(x => x.User2 == userId && x.Active == true).ToArray().Select(x => x.User1).ToList();
+
+            List<int> allFriendsIds = friendIds1.Concat(friendIds2).ToList();
+
+            List<WallVM> walls = db.Wall.Where(x => allFriendsIds.Contains(x.Id)).ToArray().OrderByDescending(x => x.DateEdited).Select(x => new WallVM(x)).ToList();
+
+            ViewBag.Walls = walls;
 
             // Return
             return View();
