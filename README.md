@@ -1,5 +1,5 @@
 # Facebook-Application
-Social network application using .Net Core, SingalR, MsSql, CRUD
+Social network application using .Net Core, SingalR, MS SQL, CRUD
 
 
 # You Can check Apllication
