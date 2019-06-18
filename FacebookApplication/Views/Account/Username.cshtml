@@ -102,6 +102,9 @@
     </div>
 }
 
+<div class="chat @User.Identity.Name">
+    <ul></ul>
+</div>
 
 
 @section Scripts {
@@ -202,6 +205,79 @@
 
             }
 
+            hub.client.getonlinefriends = function (user, data) {
+                var result = JSON.parse(data);
+
+                for (var i = 0; i < result.length; i++) {
+                    var obj = result[i];
+
+                    $(".chat." + user + "> ul").append('<li class="cf' + obj.id + '" data-id="' + obj.id + '"><img src="uploads/' + obj.id + '.jpg" /> ' + obj.friend + '</li>');
+
+                    var chatbox = $("body > .chatbox").clone();
+
+                    chatbox.attr("data-id", obj.id);
+                    chatbox.attr("id", "cb" + obj.id);
+                    chatbox.addClass("hidden");
+
+                    chatbox.find("a.sendchat").attr("data-friend", obj.friend);
+                    chatbox.find("a.sendchat").attr("data-id", obj.id);
+                    chatbox.find("div.chatboxtext").attr("id", "cbtext" + obj.id);
+
+                    $("#chb" + user).append(chatbox);
+                    $("#chb" + user + " #cb" + obj.id + " h4 > span").html('<img src="uploads/' + obj.id + '.jpg" />');
+
+                }
+
+            }
+
+            hub.client.updatechat = function (user, data) {
+                var result = JSON.parse(data);
+
+                $(".chat." + user + "> ul").empty();
+
+                for (var i = 0; i < result.length; i++) {
+                    var obj = result[i];
+
+                    $(".chat." + user + "> ul").append('<li class="cf' + obj.id + '" data-id="' + obj.id + '"><img src="uploads/' + obj.id + '.jpg" /> ' + obj.friend + '</li>');
+
+                    if (!($(".chatboxholder #cb" + obj.id).length)) {
+
+                        var chatbox = $("body > .chatbox").clone();
+
+                        chatbox.attr("data-id", obj.id);
+                        chatbox.attr("id", "cb" + obj.id);
+                        chatbox.addClass("hidden");
+
+                        chatbox.find("a.sendchat").attr("data-friend", obj.friend);
+                        chatbox.find("a.sendchat").attr("data-id", obj.id);
+                        chatbox.find("div.chatboxtext").attr("id", "cbtext" + obj.id);
+
+                        $("#chb" + user).append(chatbox);
+                        $("#chb" + user + " #cb" + obj.id + " h4 > span").html('<img src="uploads/' + obj.id + '.jpg" />');
+
+                    }
+
+                }
+
+            }
+
+            hub.client.sendchat = function (userId, user, friendId, friendUsername, message) {
+
+                var a = $("#chb" + user + " div#cb" + friendId + " .chatboxtext");
+                a.append("<img src=uploads/" + userId + ".jpg /> " + message + "<br />");
+
+                a.scrollTop(a.prop("scrollHeight"));
+
+                if ($("#chb" + friendUsername + " div#cb" + userId).hasClass("hidden")) {
+                    $('li.cf' + userId).addClass("msg");
+                }
+
+                var b = $("#chb" + friendUsername + " div#cb" + userId + " .chatboxtext");
+                b.append("<img src=uploads/" + userId + ".jpg /> " + message + "<br />");
+
+                b.scrollTop(b.prop("scrollHeight"));
+
+            }
 
             // Connect to the hub
             $.connection.hub
@@ -449,12 +525,39 @@
             /*
             / Open chat box
             */
+            $("body").on("click", ".chat ul li", function () {
+
+                var $this = $(this);
+
+                if ($this.hasClass("msg")) $this.removeClass("msg");
+
+                var friend = $this.text().trim();
+
+                var chatboxNumber = $(".chatboxholder .chatbox:not(.hidden)").length;
+
+                var id = $this.data("id");
+
+                var right = 320;
+
+                var cb = $(".chatboxholder #cb" + id);
+
+                if (!cb.length) {
+                    cb.css("right", right * chatboxNumber);
+                } else if (cb.hasClass("hidden")) {
+                    cb.removeClass("hidden");
+                    cb.css("right", right * chatboxNumber);
+                } else {
+                    cb.addClass("hidden");
+                    cb.css("right", right * chatboxNumber);
+                }
+
+            });
 
 
 
             ////////////////////////////////////////////////////
 
-
+            $(".afc").removeClass("hide");
         }); // End ready
     </script>
 
