@@ -9,7 +9,7 @@ Social network application using .Net Core, MVC 5, SingalR, MS SQL, CRUD
 ##### Login data:
 ```
 login: test
-password: test
+password: 123
 
 you can also register yourself and check the possibilities of the site.
 ```
